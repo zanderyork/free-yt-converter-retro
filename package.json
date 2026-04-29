@@ -1,0 +1,14 @@
+{
+  "name": "retro-yt-mp3",
+  "private": true,
+  "version": "1.0.0",
+  "description": "RetroTube — local YouTube to MP3/MP4 converter with a Win2K/XP retro aesthetic.",
+  "scripts": {
+    "tauri": "tauri",
+    "dev": "tauri dev",
+    "build": "tauri build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.10.0"
+  }
+}

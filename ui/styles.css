@@ -1,0 +1,505 @@
+/* ============================================================================
+   RetroTube — Win2K/XP retro UI
+   Pixel-faithful: 4-color bevels, segmented progress, dotted focus,
+   navy gradient title bar, Tahoma 11px.
+   ============================================================================ */
+
+/* ---- Color tokens (Windows 2000 classic palette) ----------------------- */
+:root {
+  --face: #d4d0c8;            /* button/window face */
+  --face-hi: #ffffff;         /* outer top-left highlight */
+  --face-hi2: #dfdfdf;        /* inner top-left highlight */
+  --face-lo: #808080;         /* inner bottom-right shadow */
+  --face-lo2: #404040;        /* outer bottom-right shadow */
+  --inset: #ffffff;           /* input/well background */
+  --text: #000000;
+  --text-disabled: #808080;
+  --text-disabled-hi: #ffffff;
+  --selection: #0a246a;       /* navy selection / progress block color */
+  --selection-text: #ffffff;
+  --title-from: #0a246a;      /* active title bar gradient start */
+  --title-to: #a6caf0;         /* active title bar gradient end */
+  --title-text: #ffffff;
+  --window-edge: #000000;
+}
+
+/* ---- Reset & base ------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  user-select: none;
+  /* Snappy. No transitions anywhere unless overridden. */
+}
+
+body {
+  font-family: Tahoma, Geneva, "MS Sans Serif", "Lucida Grande", sans-serif;
+  font-size: 11px;
+  line-height: 1.25;
+  color: var(--text);
+  /* Disable font smoothing to keep the crisp bitmap-ish pixel feel */
+  -webkit-font-smoothing: none;
+  font-smoothing: never;
+  background: var(--face);
+}
+
+button, input, select, label {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* ---- Window outer chrome ----------------------------------------------- */
+.window {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--face);
+  /* 1px solid window border with subtle outer feel */
+  border: 1px solid var(--window-edge);
+  /* The outer raised bevel that frames the entire window */
+  box-shadow:
+    inset 1px 1px 0 var(--face-hi),
+    inset -1px -1px 0 var(--face-lo2),
+    inset 2px 2px 0 var(--face-hi2),
+    inset -2px -2px 0 var(--face-lo);
+}
+
+/* ---- Title bar ---------------------------------------------------------- */
+.titlebar {
+  flex: 0 0 22px;
+  margin: 3px 3px 0 3px;
+  padding: 0 2px 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(to right, var(--title-from) 0%, var(--title-to) 100%);
+  color: var(--title-text);
+  cursor: default;
+}
+
+.titlebar__icon {
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.titlebar__title {
+  flex: 1 1 auto;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Slight shadow to mimic XP title bar glow */
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.titlebar__controls {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 2px;
+}
+
+.titlebar__btn {
+  width: 16px;
+  height: 14px;
+  border: 1px solid;
+  border-top-color: var(--face-hi);
+  border-left-color: var(--face-hi);
+  border-right-color: var(--face-lo2);
+  border-bottom-color: var(--face-lo2);
+  box-shadow:
+    inset 1px 1px 0 var(--face-hi2),
+    inset -1px -1px 0 var(--face-lo);
+  background: var(--face);
+  color: #000000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+}
+
+.titlebar__btn:active:not(.titlebar__btn--disabled) {
+  border-top-color: var(--face-lo2);
+  border-left-color: var(--face-lo2);
+  border-right-color: var(--face-hi);
+  border-bottom-color: var(--face-hi);
+  box-shadow:
+    inset 1px 1px 0 var(--face-lo),
+    inset -1px -1px 0 var(--face-hi2);
+}
+
+.titlebar__btn--disabled {
+  cursor: default;
+}
+.titlebar__btn--disabled .glyph {
+  /* Classic two-tone disabled effect: dark glyph + offset white shadow */
+  color: var(--text-disabled);
+  text-shadow: 1px 1px 0 var(--text-disabled-hi);
+}
+
+/* ---- Title bar control glyphs (drawn with CSS so we don't need Marlett) -- */
+.glyph {
+  position: relative;
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+}
+.glyph-min::before {
+  content: "";
+  position: absolute;
+  bottom: 1px;
+  left: 1px;
+  width: 7px;
+  height: 2px;
+  background: currentColor;
+}
+.glyph-max::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid currentColor;
+  border-top-width: 2px;
+}
+.glyph-close::before,
+.glyph-close::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 0;
+  width: 9px;
+  height: 1px;
+  background: currentColor;
+  transform-origin: center;
+}
+.glyph-close::before { transform: rotate(45deg); }
+.glyph-close::after  { transform: rotate(-45deg); }
+
+/* ---- Client area -------------------------------------------------------- */
+.client {
+  flex: 1 1 auto;
+  padding: 8px 10px 6px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+}
+
+/* ---- Rows --------------------------------------------------------------- */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.row--url {
+  gap: 6px;
+}
+
+.lbl {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.lbl--quality {
+  width: 48px;
+}
+
+/* ---- Sunken text input -------------------------------------------------- */
+.text-input {
+  flex: 1 1 auto;
+  height: 20px;
+  background: var(--inset);
+  color: var(--text);
+  border: 1px solid;
+  border-top-color: var(--face-lo2);
+  border-left-color: var(--face-lo2);
+  border-right-color: var(--face-hi);
+  border-bottom-color: var(--face-hi);
+  box-shadow:
+    inset 1px 1px 0 var(--face-lo),
+    inset -1px -1px 0 var(--face-hi2);
+  padding: 2px 4px;
+  outline: none;
+  user-select: text;
+}
+
+.text-input:focus {
+  /* Native blue focus would feel un-Win2K. Just keep border crisp. */
+}
+
+/* ---- Group box (etched border with caption) ----------------------------- */
+.groupbox {
+  position: relative;
+  border: none;
+  margin-top: 6px;
+  padding: 14px 8px 8px 8px;
+  background: transparent;
+  /* Etched groove: dark line top-left, light line bottom-right, with inset
+     companion lines forming the classic 2-pixel etched look. */
+  outline: 1px solid var(--face-hi);
+  outline-offset: -2px;
+  border-top: 1px solid var(--face-lo);
+  border-left: 1px solid var(--face-lo);
+  border-right: 1px solid var(--face-hi);
+  border-bottom: 1px solid var(--face-hi);
+  box-shadow:
+    inset 1px 1px 0 transparent;
+}
+
+.groupbox > legend {
+  padding: 0 4px;
+  margin-left: 4px;
+  background: var(--face);
+  color: var(--text);
+}
+
+.groupbox--progress {
+  padding-bottom: 6px;
+}
+
+/* ---- Format radios ------------------------------------------------------ */
+.row--format {
+  gap: 16px;
+  margin-bottom: 6px;
+}
+
+.radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: default;
+}
+
+.radio input {
+  /* Hide the native control; we draw our own pixel-perfect dot. */
+  position: absolute;
+  opacity: 0;
+  width: 12px;
+  height: 12px;
+  margin: 0;
+  cursor: default;
+}
+
+.radio__box {
+  width: 12px;
+  height: 12px;
+  background: var(--inset);
+  border-radius: 50%;
+  position: relative;
+  flex: 0 0 12px;
+  /* Sunken bevel via 4-direction borders + inset shadows.
+     Round borders are a bit awkward; we approximate with shadow rings. */
+  box-shadow:
+    inset 1px 1px 0 var(--face-lo),
+    inset -1px -1px 0 var(--face-hi2),
+    inset 0 0 0 1px var(--face-lo2);
+}
+
+.radio input:checked ~ .radio__box::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 6px;
+  height: 6px;
+  background: var(--text);
+  border-radius: 50%;
+}
+
+.radio input:focus-visible ~ .radio__box {
+  outline: 1px dotted var(--text);
+  outline-offset: 1px;
+}
+
+/* ---- Quality dropdown --------------------------------------------------- */
+.select {
+  flex: 1 1 auto;
+  height: 20px;
+  background: var(--inset);
+  color: var(--text);
+  border: 1px solid;
+  border-top-color: var(--face-lo2);
+  border-left-color: var(--face-lo2);
+  border-right-color: var(--face-hi);
+  border-bottom-color: var(--face-hi);
+  box-shadow:
+    inset 1px 1px 0 var(--face-lo),
+    inset -1px -1px 0 var(--face-hi2);
+  padding: 1px 4px;
+  outline: none;
+  /* Hide native macOS chrome where possible */
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--text) 50%),
+                    linear-gradient(-45deg, transparent 50%, var(--text) 50%);
+  background-position:
+    calc(100% - 9px) 9px,
+    calc(100% - 4px) 9px;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 18px;
+}
+
+.select:disabled {
+  color: var(--text-disabled);
+  text-shadow: 1px 1px 0 var(--text-disabled-hi);
+  background-color: var(--face);
+}
+
+/* ---- Progress well + segmented blocks ---------------------------------- */
+.progress-well {
+  position: relative;
+  height: 16px;
+  background: var(--inset);
+  border: 1px solid;
+  border-top-color: var(--face-lo2);
+  border-left-color: var(--face-lo2);
+  border-right-color: var(--face-hi);
+  border-bottom-color: var(--face-hi);
+  box-shadow:
+    inset 1px 1px 0 var(--face-lo),
+    inset -1px -1px 0 var(--face-hi2);
+  padding: 1px;
+  display: flex;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.progress-segment {
+  flex: 1 1 0;
+  height: 100%;
+  background: transparent;
+  /* No transition — this should feel like marching squares, snapping in. */
+}
+
+.progress-segment.filled {
+  background: var(--selection);
+}
+
+.status-line {
+  margin-top: 6px;
+  height: 16px;
+  font-size: 11px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- Buttons row -------------------------------------------------------- */
+.row--buttons {
+  margin-top: auto;
+  gap: 6px;
+}
+
+.btn {
+  min-width: 75px;
+  height: 23px;
+  padding: 1px 12px;
+  background: var(--face);
+  color: var(--text);
+  border: 1px solid;
+  border-top-color: var(--face-hi);
+  border-left-color: var(--face-hi);
+  border-right-color: var(--face-lo2);
+  border-bottom-color: var(--face-lo2);
+  box-shadow:
+    inset 1px 1px 0 var(--face-hi2),
+    inset -1px -1px 0 var(--face-lo);
+  cursor: default;
+  outline: none;
+  position: relative;
+}
+
+.btn--right {
+  margin-left: auto;
+}
+
+.btn:active:not(:disabled) {
+  /* Sunken when held — bevel direction reverses */
+  border-top-color: var(--face-lo2);
+  border-left-color: var(--face-lo2);
+  border-right-color: var(--face-hi);
+  border-bottom-color: var(--face-hi);
+  box-shadow:
+    inset 1px 1px 0 var(--face-lo),
+    inset -1px -1px 0 var(--face-hi2);
+  padding: 2px 11px 0 13px; /* nudge text 1px down-right when pressed */
+}
+
+.btn:focus-visible:not(:disabled) {
+  outline: 1px dotted var(--text);
+  outline-offset: -4px;
+}
+
+.btn:disabled {
+  color: var(--text-disabled);
+  text-shadow: 1px 1px 0 var(--text-disabled-hi);
+}
+
+.btn.is-default:not(:disabled) {
+  /* Default button gets an extra dark outer frame, classic Win9x. We use
+     box-shadow for the outer ring so it sits outside the bevel. */
+  box-shadow:
+    inset 1px 1px 0 var(--face-hi2),
+    inset -1px -1px 0 var(--face-lo),
+    0 0 0 1px var(--text);
+}
+
+/* ---- Status bar (bottom of window) ------------------------------------- */
+.statusbar {
+  flex: 0 0 18px;
+  margin: 0 3px 3px 3px;
+  display: flex;
+  gap: 2px;
+}
+
+.statusbar__cell {
+  flex: 1 1 auto;
+  height: 18px;
+  padding: 2px 6px 0 6px;
+  background: var(--face);
+  border: 1px solid;
+  border-top-color: var(--face-lo);
+  border-left-color: var(--face-lo);
+  border-right-color: var(--face-hi);
+  border-bottom-color: var(--face-hi);
+  box-shadow:
+    inset 1px 1px 0 var(--face-lo2),
+    inset -1px -1px 0 var(--face-hi2);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statusbar__cell--right {
+  flex: 0 0 110px;
+  text-align: left;
+}
+
+/* ---- Misc utility states ----------------------------------------------- */
+.is-error {
+  color: #800000;
+}
+.is-success {
+  color: #006400;
+}

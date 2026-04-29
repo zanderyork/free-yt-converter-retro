@@ -1,0 +1,61 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "RetroTube",
+  "version": "1.0.0",
+  "identifier": "app.retrotube.local",
+  "build": {
+    "frontendDist": "../ui",
+    "devUrl": null,
+    "beforeDevCommand": "",
+    "beforeBuildCommand": ""
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "RetroTube",
+        "width": 480,
+        "height": 360,
+        "minWidth": 480,
+        "minHeight": 360,
+        "maxWidth": 480,
+        "maxHeight": 360,
+        "resizable": false,
+        "fullscreen": false,
+        "decorations": false,
+        "transparent": false,
+        "shadow": true,
+        "visible": false,
+        "center": true,
+        "alwaysOnTop": false,
+        "skipTaskbar": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' ipc: http://ipc.localhost"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app", "dmg"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns"
+    ],
+    "category": "Utility",
+    "shortDescription": "Local YouTube to MP3/MP4 converter.",
+    "longDescription": "RetroTube is a local-first YouTube to MP3/MP4 converter for Apple Silicon, wrapped in a Windows 2000/XP retro aesthetic. No telemetry, no cloud, no accounts.",
+    "externalBin": [
+      "binaries/yt-dlp",
+      "binaries/ffmpeg"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "11.0",
+      "frameworks": []
+    }
+  },
+  "plugins": {}
+}

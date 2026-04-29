@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RetroTube</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="window">
+      <!-- Title bar (drag region) -->
+      <div class="titlebar" data-tauri-drag-region>
+        <div class="titlebar__icon" aria-hidden="true">
+          <!-- Chunky 16x16 pixel-art icon: cassette tape + reel -->
+          <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+            <rect x="1" y="3" width="14" height="10" fill="#1a1a1a"/>
+            <rect x="2" y="4" width="12" height="8" fill="#c0c0c0"/>
+            <rect x="3" y="5" width="3" height="3" fill="#1a1a1a"/>
+            <rect x="4" y="6" width="1" height="1" fill="#c0c0c0"/>
+            <rect x="10" y="5" width="3" height="3" fill="#1a1a1a"/>
+            <rect x="11" y="6" width="1" height="1" fill="#c0c0c0"/>
+            <rect x="3" y="9" width="10" height="2" fill="#1a1a1a"/>
+            <rect x="6" y="11" width="4" height="1" fill="#444444"/>
+          </svg>
+        </div>
+        <div class="titlebar__title" data-tauri-drag-region>RetroTube</div>
+        <div class="titlebar__controls">
+          <button class="titlebar__btn" id="btn-minimize" title="Minimize" aria-label="Minimize">
+            <span class="glyph glyph-min"></span>
+          </button>
+          <button class="titlebar__btn titlebar__btn--disabled" id="btn-maximize" title="Maximize" aria-label="Maximize" tabindex="-1" disabled>
+            <span class="glyph glyph-max"></span>
+          </button>
+          <button class="titlebar__btn" id="btn-close" title="Close" aria-label="Close">
+            <span class="glyph glyph-close"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Client area -->
+      <div class="client">
+        <!-- URL row -->
+        <div class="row row--url">
+          <label for="url" class="lbl">URL:</label>
+          <input
+            type="text"
+            id="url"
+            class="text-input"
+            spellcheck="false"
+            autocomplete="off"
+            placeholder="https://www.youtube.com/watch?v=…"
+          />
+        </div>
+
+        <!-- Output options groupbox -->
+        <fieldset class="groupbox">
+          <legend>Output</legend>
+          <div class="row row--format">
+            <label class="radio">
+              <input type="radio" name="format" value="mp3" checked />
+              <span class="radio__box" aria-hidden="true"></span>
+              <span>MP3 (audio)</span>
+            </label>
+            <label class="radio">
+              <input type="radio" name="format" value="mp4" />
+              <span class="radio__box" aria-hidden="true"></span>
+              <span>MP4 (video)</span>
+            </label>
+          </div>
+          <div class="row row--quality">
+            <label for="quality" class="lbl lbl--quality">Quality:</label>
+            <select id="quality" class="select">
+              <!-- Options are populated dynamically based on selected format -->
+            </select>
+          </div>
+        </fieldset>
+
+        <!-- Progress groupbox -->
+        <fieldset class="groupbox groupbox--progress">
+          <legend>Progress</legend>
+          <div class="progress-well" id="progress-well" aria-hidden="true">
+            <!-- Segmented blocks injected by JS -->
+          </div>
+          <div class="status-line" id="status-line">Ready</div>
+        </fieldset>
+
+        <!-- Action buttons -->
+        <div class="row row--buttons">
+          <button class="btn" id="btn-convert" type="button">Convert</button>
+          <button class="btn" id="btn-cancel" type="button" disabled>Cancel</button>
+          <button class="btn btn--right" id="btn-open-folder" type="button">Open Folder</button>
+        </div>
+      </div>
+
+      <!-- Status bar -->
+      <div class="statusbar">
+        <div class="statusbar__cell statusbar__cell--main" id="statusbar-main">Ready</div>
+        <div class="statusbar__cell statusbar__cell--right" id="statusbar-right">Idle</div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

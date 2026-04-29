@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Tauri build output
+src-tauri/target/
+src-tauri/gen/
+
+# Bundled binaries (downloaded by scripts/fetch-sidecars.sh)
+src-tauri/binaries/yt-dlp*
+src-tauri/binaries/ffmpeg*
+!src-tauri/binaries/.gitkeep
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+*.log

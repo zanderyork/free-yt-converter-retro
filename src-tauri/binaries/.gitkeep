@@ -1,0 +1,2 @@
+# yt-dlp and ffmpeg sidecars are downloaded here by scripts/fetch-sidecars.sh
+# at build/setup time. They are gitignored.
